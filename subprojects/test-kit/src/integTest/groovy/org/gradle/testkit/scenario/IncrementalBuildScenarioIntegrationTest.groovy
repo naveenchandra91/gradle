@@ -62,4 +62,28 @@ class IncrementalBuildScenarioIntegrationTest extends AbstractGradleScenarioInte
         result.ofStep(IncrementalBuildScenario.Steps.UP_TO_DATE_BUILD)
         result.ofStep(IncrementalBuildScenario.Steps.INCREMENTAL_BUILD)
     }
+
+    def "incremental build step fails when input not annotated properly"() {
+
+        given:
+        def scenario = IncrementalBuildScenario.create()
+            .withRunnerFactory { runner().withArguments("-Dheader=ORIGINAL").forwardOutput() }
+            .withBaseDirectory(underTestBaseDirectory)
+            .withWorkspace { root ->
+                underTestWorkspace.execute(root)
+                def buildFile = new File(root, 'build.gradle')
+                buildFile.text = buildFile.text.replaceAll("@Input\n", "\n")
+            }
+            .withTaskPaths(underTestTaskPath)
+            .withInputChangeRunnerAction { runner ->
+                runner.withArguments(runner.arguments + "-Dheader=CHANGED")
+            }
+
+        when:
+        scenario.run()
+
+        then:
+        def ex = thrown(AssertionError)
+        ex.message == "Step '${IncrementalBuildScenario.Steps.INCREMENTAL_BUILD}': expected task ':underTest' to be SUCCESS but was UP_TO_DATE"
+    }
 }

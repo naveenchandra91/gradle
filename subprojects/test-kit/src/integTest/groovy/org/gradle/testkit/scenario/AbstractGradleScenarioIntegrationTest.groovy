@@ -23,6 +23,7 @@ import org.gradle.testkit.runner.fixtures.GradleRunnerScenario
 
 import java.util.function.Supplier
 
+
 @GradleRunnerScenario
 class AbstractGradleScenarioIntegrationTest extends BaseGradleRunnerIntegrationTest {
 
@@ -75,5 +76,11 @@ class AbstractGradleScenarioIntegrationTest extends BaseGradleRunnerIntegrationT
             }
 
         """.stripIndent()
+    }
+
+    protected static Action<File> getEmptyBuildWorkspace() {
+        return { File root ->
+            new File(root, 'settings.gradle') << 'rootProject.name = "test"'
+        }
     }
 }
