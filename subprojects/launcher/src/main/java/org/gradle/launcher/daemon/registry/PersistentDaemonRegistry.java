@@ -51,6 +51,8 @@ public class PersistentDaemonRegistry implements DaemonRegistry {
     private static final Logger LOGGER = Logging.getLogger(PersistentDaemonRegistry.class);
 
     public PersistentDaemonRegistry(File registryFile, FileLockManager fileLockManager, Chmod chmod) {
+        System.out.println("-> CREATE REGISTRY " + registryFile);
+
         this.registryFile = registryFile;
         cache = new FileIntegrityViolationSuppressingPersistentStateCacheDecorator<DaemonRegistryContent>(
             new SimpleStateCache<DaemonRegistryContent>(
